@@ -11,6 +11,12 @@ export interface Step {
   description: string;
 }
 
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+}
+
 export interface Recipe {
   id: string;
   title: string;
@@ -24,6 +30,7 @@ export interface Recipe {
   labels: string[];
   createdAt: Date;
   updatedAt: Date;
+  userId: string;
 }
 
-export type RecipeFormData = Omit<Recipe, "id" | "createdAt" | "updatedAt">;
+export type RecipeFormData = Omit<Recipe, "id" | "createdAt" | "updatedAt" | "userId">;

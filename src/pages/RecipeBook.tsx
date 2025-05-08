@@ -1,22 +1,32 @@
 
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BookView } from "@/components/ui/book-view";
 import { RecipeDetails } from "@/components/recipe-details";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { Recipe } from "@/types/recipe";
 import { ArrowLeft } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { TableOfContents } from "@/components/table-of-contents";
 
 export default function RecipeBook() {
+  const { isAuthenticated, user } = useAuth();
   const [recipes] = useLocalStorage<Recipe[]>("recipes", []);
-  const [currentPage, setCurrentPage] = React.useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
   
-  if (recipes.length === 0) {
+  // Filter recipes for the current user
+  const userRecipes = recipes.filter(recipe => recipe.userId === user?.id);
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
+  if (userRecipes.length === 0) {
     return (
       <div className="container py-8">
-        <h1 className="text-3xl font-bold text-olive-800 mb-6">Your Recipe Book</h1>
-        <p>You don't have any recipes yet. Create some to view them in book format.</p>
+        <h1 className="text-3xl font-bold text-olive-800 mb-6 font-playfair">Your Recipe Book</h1>
+        <p className="font-playfair">You don't have any recipes yet. Create some to view them in book format.</p>
         <Button asChild className="mt-4 bg-olive-700 hover:bg-olive-800">
           <Link to="/create">Create Your First Recipe</Link>
         </Button>
@@ -27,7 +37,7 @@ export default function RecipeBook() {
   return (
     <div className="container py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-olive-800">Your Recipe Book</h1>
+        <h1 className="text-3xl font-bold text-olive-800 font-playfair">Your Recipe Book</h1>
         <Button
           variant="outline"
           asChild
@@ -39,14 +49,34 @@ export default function RecipeBook() {
         </Button>
       </div>
       
-      <BookView 
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-      >
-        {recipes.map((recipe) => (
-          <RecipeDetails key={recipe.id} recipe={recipe} />
-        ))}
-      </BookView>
+      {/* Table of Contents for the first page */}
+      {currentPage === 0 ? (
+        <BookView 
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        >
+          <TableOfContents 
+            recipes={userRecipes} 
+            onSelectRecipe={(index) => setCurrentPage(index + 1)}
+          />
+          {userRecipes.map((recipe) => (
+            <RecipeDetails key={recipe.id} recipe={recipe} />
+          ))}
+        </BookView>
+      ) : (
+        <BookView 
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        >
+          <TableOfContents 
+            recipes={userRecipes} 
+            onSelectRecipe={(index) => setCurrentPage(index + 1)}
+          />
+          {userRecipes.map((recipe) => (
+            <RecipeDetails key={recipe.id} recipe={recipe} />
+          ))}
+        </BookView>
+      )}
     </div>
   );
 }
