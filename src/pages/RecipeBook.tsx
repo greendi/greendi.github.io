@@ -25,8 +25,8 @@ export default function RecipeBook() {
   if (userRecipes.length === 0) {
     return (
       <div className="container py-8">
-        <h1 className="text-3xl font-bold text-olive-800 mb-6 font-playfair">Your Recipe Book</h1>
-        <p className="font-playfair">You don't have any recipes yet. Create some to view them in book format.</p>
+        <h1 className="text-3xl font-bold text-olive-800 mb-6">Your Recipe Book</h1>
+        <p>You don't have any recipes yet. Create some to view them in book format.</p>
         <Button asChild className="mt-4 bg-olive-700 hover:bg-olive-800">
           <Link to="/create">Create Your First Recipe</Link>
         </Button>
@@ -34,10 +34,24 @@ export default function RecipeBook() {
     );
   }
 
+  // Create book pages array - table of contents and individual recipes
+  const bookPages = [
+    // First page is Table of Contents
+    <TableOfContents 
+      key="toc"
+      recipes={userRecipes} 
+      onSelectRecipe={(index) => setCurrentPage(index + 1)}
+    />,
+    // The rest are individual recipe pages
+    ...userRecipes.map((recipe) => (
+      <RecipeDetails key={recipe.id} recipe={recipe} />
+    ))
+  ];
+
   return (
     <div className="container py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-olive-800 font-playfair">Your Recipe Book</h1>
+        <h1 className="text-3xl font-bold text-olive-800">Your Recipe Book</h1>
         <Button
           variant="outline"
           asChild
@@ -49,34 +63,12 @@ export default function RecipeBook() {
         </Button>
       </div>
       
-      {/* Table of Contents for the first page */}
-      {currentPage === 0 ? (
-        <BookView 
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-        >
-          <TableOfContents 
-            recipes={userRecipes} 
-            onSelectRecipe={(index) => setCurrentPage(index + 1)}
-          />
-          {userRecipes.map((recipe) => (
-            <RecipeDetails key={recipe.id} recipe={recipe} />
-          ))}
-        </BookView>
-      ) : (
-        <BookView 
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-        >
-          <TableOfContents 
-            recipes={userRecipes} 
-            onSelectRecipe={(index) => setCurrentPage(index + 1)}
-          />
-          {userRecipes.map((recipe) => (
-            <RecipeDetails key={recipe.id} recipe={recipe} />
-          ))}
-        </BookView>
-      )}
+      <BookView 
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      >
+        {bookPages}
+      </BookView>
     </div>
   );
 }

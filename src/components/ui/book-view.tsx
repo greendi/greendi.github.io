@@ -27,6 +27,12 @@ const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
           setActivePage(newPage);
           onPageChange?.(newPage);
           setIsFlipping(false);
+          
+          // Scroll to top of the book when page changes
+          const bookElement = document.querySelector('.book-container');
+          if (bookElement) {
+            bookElement.scrollIntoView({ behavior: 'smooth' });
+          }
         }, 300);
       }
     };
@@ -34,7 +40,7 @@ const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
     return (
       <div
         ref={ref}
-        className={cn("w-full max-w-5xl mx-auto relative", className)}
+        className={cn("w-full max-w-5xl mx-auto relative book-container", className)}
         {...props}
       >
         <div className="flex flex-col items-center">
@@ -55,9 +61,6 @@ const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
                     "w-full px-6 py-8 overflow-y-auto recipe-page book-page-transition", 
                     isFlipping && "opacity-0 scale-95"
                   )}
-                  style={{
-                    fontFamily: "'Playfair Display', serif"
-                  }}
                 >
                   {children[activePage]}
                 </div>
@@ -71,18 +74,18 @@ const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
               onClick={() => handlePageChange(activePage - 1)}
               disabled={activePage === 0}
               variant="outline"
-              className="border-olive-500 font-playfair"
+              className="border-olive-500 font-indie"
             >
               <ChevronLeft className="mr-2 h-4 w-4" /> Previous Page
             </Button>
-            <span className="text-olive-800 font-semibold font-playfair">
+            <span className="text-olive-800 font-semibold">
               Page {activePage + 1} of {totalPages}
             </span>
             <Button
               onClick={() => handlePageChange(activePage + 1)}
               disabled={activePage === totalPages - 1}
               variant="outline"
-              className="border-olive-500 font-playfair"
+              className="border-olive-500 font-indie"
             >
               Next Page <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
