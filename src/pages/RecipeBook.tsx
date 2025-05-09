@@ -9,6 +9,7 @@ import { Recipe } from "@/types/recipe";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { TableOfContents } from "@/components/table-of-contents";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function RecipeBook() {
   const { isAuthenticated, user } = useAuth();

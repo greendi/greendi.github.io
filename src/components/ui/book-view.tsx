@@ -3,6 +3,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "./button";
+import { ScrollArea } from "./scroll-area";
 
 interface BookViewProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode[];
@@ -56,14 +57,16 @@ const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
                 <div className="absolute inset-0 shadow-[inset_12px_0_18px_-10px_rgba(0,0,0,0.4)]" />
                 
                 {/* Page content */}
-                <div 
-                  className={cn(
-                    "w-full px-6 py-8 overflow-y-auto recipe-page book-page-transition", 
-                    isFlipping && "opacity-0 scale-95"
-                  )}
-                >
-                  {children[activePage]}
-                </div>
+                <ScrollArea className="w-full h-full">
+                  <div 
+                    className={cn(
+                      "w-full px-6 py-8 recipe-page book-page-transition", 
+                      isFlipping && "opacity-0 scale-95"
+                    )}
+                  >
+                    {children[activePage]}
+                  </div>
+                </ScrollArea>
               </div>
             </div>
           </div>
