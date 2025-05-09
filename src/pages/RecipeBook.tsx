@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,8 +15,12 @@ export default function RecipeBook() {
   const [recipes] = useLocalStorage<Recipe[]>("recipes", []);
   const [currentPage, setCurrentPage] = useState(0);
   
-  // Filter recipes for the current user
-  const userRecipes = recipes.filter(recipe => recipe.userId === user?.id);
+  // Filter recipes for the current user and exclude hardcoded recipes
+  const userRecipes = recipes.filter(recipe => 
+    recipe.userId === user?.id && 
+    recipe.title !== "Pasta Carbonara" && 
+    recipe.title !== "Chicken and Avocado Wrap"
+  );
   
   if (!isAuthenticated) {
     return <Navigate to="/login" />;

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -7,11 +6,19 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { Recipe } from "@/types/recipe";
 import { Plus, BookOpen } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
   const [recipes] = useLocalStorage<Recipe[]>("recipes", []);
+  const { user } = useAuth();
   
-  if (recipes.length === 0) {
+  // Filter out hardcoded recipes
+  const filteredRecipes = recipes.filter(recipe => 
+    recipe.title !== "Pasta Carbonara" && 
+    recipe.title !== "Chicken and Avocado Wrap"
+  );
+  
+  if (filteredRecipes.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6">
         <div className="max-w-md text-center space-y-6">
@@ -51,23 +58,23 @@ export default function Home() {
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="all">All Recipes</TabsTrigger>
-          {Array.from(new Set(recipes.flatMap(r => r.labels))).slice(0, 5).map(label => (
+          {Array.from(new Set(filteredRecipes.flatMap(r => r.labels))).slice(0, 5).map(label => (
             <TabsTrigger key={label} value={label}>{label}</TabsTrigger>
           ))}
         </TabsList>
         
         <TabsContent value="all">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recipes.map((recipe) => (
+            {filteredRecipes.map((recipe) => (
               <RecipeCard key={recipe.id} recipe={recipe} />
             ))}
           </div>
         </TabsContent>
         
-        {Array.from(new Set(recipes.flatMap(r => r.labels))).slice(0, 5).map(label => (
+        {Array.from(new Set(filteredRecipes.flatMap(r => r.labels))).slice(0, 5).map(label => (
           <TabsContent key={label} value={label}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recipes.filter(recipe => recipe.labels.includes(label)).map((recipe) => (
+              {filteredRecipes.filter(recipe => recipe.labels.includes(label)).map((recipe) => (
                 <RecipeCard key={recipe.id} recipe={recipe} />
               ))}
             </div>
