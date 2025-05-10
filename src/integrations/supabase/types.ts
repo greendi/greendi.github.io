@@ -9,7 +9,161 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      ingredients: {
+        Row: {
+          amount: string
+          id: string
+          name: string
+          recipe_id: string
+          unit: string
+        }
+        Insert: {
+          amount: string
+          id?: string
+          name: string
+          recipe_id: string
+          unit: string
+        }
+        Update: {
+          amount?: string
+          id?: string
+          name?: string
+          recipe_id?: string
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingredients_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      labels: {
+        Row: {
+          id: string
+          name: string
+          recipe_id: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          recipe_id: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          recipe_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "labels_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          name?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+        }
+        Relationships: []
+      }
+      recipes: {
+        Row: {
+          cook_time: number
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          prep_time: number
+          servings: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cook_time: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          prep_time: number
+          servings: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cook_time?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          prep_time?: number
+          servings?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      steps: {
+        Row: {
+          description: string
+          id: string
+          order_number: number
+          recipe_id: string
+        }
+        Insert: {
+          description: string
+          id?: string
+          order_number: number
+          recipe_id: string
+        }
+        Update: {
+          description?: string
+          id?: string
+          order_number?: number
+          recipe_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "steps_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

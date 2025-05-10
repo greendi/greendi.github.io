@@ -1,65 +1,151 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { useLocalStorage } from "@/hooks/use-local-storage";
-import { User } from "@/types/recipe";
+import { User, Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+interface Profile {
+  id: string;
+  name: string | null;
+  email: string | null;
+}
 
 interface AuthContextType {
   user: User | null;
+  profile: Profile | null;
+  session: Session | null;
+  isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => boolean;
-  logout: () => void;
-  register: (email: string, password: string, name?: string) => boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  register: (email: string, password: string, name?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useLocalStorage<User | null>("current-user", null);
-  const [users, setUsers] = useLocalStorage<{ email: string; password: string; user: User }[]>("users", []);
-  
-  const register = (email: string, password: string, name?: string): boolean => {
-    // Check if user already exists
-    if (users.some(u => u.email === email)) {
-      toast.error("User with this email already exists");
-      return false;
-    }
-    
-    const newUser: User = {
-      id: uuidv4(),
-      email,
-      name
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, currentSession) => {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        if (currentSession?.user) {
+          // Use setTimeout to avoid potential deadlocks
+          setTimeout(async () => {
+            await fetchProfile(currentSession.user.id);
+          }, 0);
+        } else {
+          setProfile(null);
+        }
+      }
+    );
+
+    // Initial session check
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+        
+        if (initialSession?.user) {
+          await fetchProfile(initialSession.user.id);
+        }
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    
-    setUsers([...users, { email, password, user: newUser }]);
-    setUser(newUser);
-    toast.success("Account created successfully!");
-    return true;
-  };
-  
-  const login = (email: string, password: string): boolean => {
-    const userAccount = users.find(u => u.email === email && u.password === password);
-    
-    if (userAccount) {
-      setUser(userAccount.user);
-      toast.success("Logged in successfully!");
-      return true;
-    } else {
-      toast.error("Invalid email or password");
-      return false;
+
+    initializeAuth();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, name, email')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return;
+      }
+      
+      setProfile(data);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
     }
   };
-  
-  const logout = () => {
-    setUser(null);
-    toast.success("Logged out successfully!");
+
+  const login = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email, password
+      });
+
+      if (error) throw error;
+      
+      toast.success("Logged in successfully!");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to sign in");
+      throw error;
+    }
   };
-  
+
+  const logout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      toast.success("Logged out successfully!");
+    } catch (error: any) {
+      toast.error(error.message || "Error signing out");
+      throw error;
+    }
+  };
+
+  const register = async (email: string, password: string, name?: string) => {
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name
+          }
+        }
+      });
+
+      if (error) throw error;
+      
+      toast.success("Account created successfully! Please check your email to confirm your account.");
+    } catch (error: any) {
+      toast.error(error.message || "Registration failed");
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
         user,
+        profile,
+        session,
+        isLoading,
         isAuthenticated: !!user,
         login,
         logout,

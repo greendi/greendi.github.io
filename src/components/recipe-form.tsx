@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -8,15 +8,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { X, Plus, ChefHat, Clock, Users, Tag } from "lucide-react";
+import { X, Plus, ChefHat, Clock, Users, Tag, Upload } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { RecipeFormData } from "@/types/recipe";
 import { toast } from "@/components/ui/sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 const recipeFormSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  imageUrl: z.string().url("Must be a valid URL").or(z.string().length(0)),
+  imageUrl: z.string().optional(),
   prepTime: z.coerce.number().min(1, "Preparation time is required"),
   cookTime: z.coerce.number().min(1, "Cooking time is required"),
   servings: z.coerce.number().min(1, "Number of servings is required"),
@@ -43,10 +44,12 @@ interface RecipeFormProps {
   defaultValues?: Partial<RecipeFormData>;
   onSubmit: (data: RecipeFormData) => void;
   isEditing?: boolean;
+  isSubmitting?: boolean;
 }
 
-export function RecipeForm({ defaultValues, onSubmit, isEditing = false }: RecipeFormProps) {
-  const [labelInput, setLabelInput] = React.useState("");
+export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmitting = false }: RecipeFormProps) {
+  const [labelInput, setLabelInput] = useState("");
+  const [previewImage, setPreviewImage] = useState<string | null>(defaultValues?.imageUrl || null);
 
   const form = useForm<RecipeFormValues>({
     resolver: zodResolver(recipeFormSchema),
@@ -86,10 +89,26 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false }: Recip
     form.setValue("labels", labels.filter(label => label !== labelToRemove));
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      toast.error("Image is too large. Please select an image under 5MB.");
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPreviewImage(reader.result as string);
+      form.setValue("imageUrl", reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = (data: RecipeFormValues) => {
     try {
       onSubmit(data as RecipeFormData);
-      toast.success(isEditing ? "Recipe updated!" : "Recipe created!");
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
       console.error(error);
@@ -140,19 +159,55 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false }: Recip
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Image URL (optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://example.com/image.jpg" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div>
+                  <FormLabel>Recipe Image (optional)</FormLabel>
+                  <div className="mt-2 space-y-2">
+                    {previewImage && (
+                      <div className="relative w-full h-40 overflow-hidden rounded-md border border-gray-200">
+                        <img 
+                          src={previewImage} 
+                          alt="Recipe preview" 
+                          className="w-full h-full object-cover"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-2 right-2"
+                          onClick={() => {
+                            setPreviewImage(null);
+                            form.setValue("imageUrl", "");
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {!previewImage && (
+                      <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center">
+                        <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                        <p className="text-sm text-gray-500 mb-1">Click to upload or drag and drop</p>
+                        <p className="text-xs text-gray-500">SVG, PNG, JPG (max. 5MB)</p>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          onChange={handleImageChange}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={() => (
+                      <FormItem>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <div className="grid grid-cols-3 gap-4">
                   <FormField
@@ -243,6 +298,12 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false }: Recip
                       value={labelInput}
                       onChange={(e) => setLabelInput(e.target.value)}
                       className="flex-1"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          addLabel();
+                        }
+                      }}
                     />
                     <Button
                       type="button"
@@ -366,8 +427,15 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false }: Recip
             </div>
           </CardContent>
           <CardFooter className="flex justify-end gap-2 border-t border-olive-100 pt-4">
-            <Button type="submit" className="bg-olive-700 hover:bg-olive-800">
-              {isEditing ? "Update Recipe" : "Create Recipe"}
+            <Button type="submit" className="bg-olive-700 hover:bg-olive-800" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Spinner size="sm" className="mr-2" />
+                  {isEditing ? "Updating Recipe..." : "Creating Recipe..."}
+                </>
+              ) : (
+                isEditing ? "Update Recipe" : "Create Recipe"
+              )}
             </Button>
           </CardFooter>
         </Card>

@@ -1,24 +1,67 @@
-import React from "react";
+
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { RecipeCard } from "@/components/recipe-card";
-import { useLocalStorage } from "@/hooks/use-local-storage";
 import { Recipe } from "@/types/recipe";
 import { Plus, BookOpen } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
+import { recipeService } from "@/services/recipe.service";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Home() {
-  const [recipes] = useLocalStorage<Recipe[]>("recipes", []);
-  const { user } = useAuth();
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user, isAuthenticated } = useAuth();
   
-  // Filter out hardcoded recipes
-  const filteredRecipes = recipes.filter(recipe => 
-    recipe.title !== "Pasta Carbonara" && 
-    recipe.title !== "Chicken and Avocado Wrap"
-  );
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const data = await recipeService.getAllRecipes();
+        setRecipes(data);
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchRecipes();
+    } else {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
   
-  if (filteredRecipes.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+        <div className="max-w-md text-center space-y-6">
+          <h1 className="text-3xl font-bold text-olive-800">Welcome to Recipe Book</h1>
+          <p className="text-olive-600">Log in or register to start creating your delicious recipes.</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild className="bg-olive-700 hover:bg-olive-800">
+              <Link to="/login">Sign In</Link>
+            </Button>
+            <Button asChild variant="outline" className="border-olive-500">
+              <Link to="/register">Create Account</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (recipes.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6">
         <div className="max-w-md text-center space-y-6">
@@ -58,23 +101,23 @@ export default function Home() {
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="all">All Recipes</TabsTrigger>
-          {Array.from(new Set(filteredRecipes.flatMap(r => r.labels))).slice(0, 5).map(label => (
+          {Array.from(new Set(recipes.flatMap(r => r.labels))).slice(0, 5).map(label => (
             <TabsTrigger key={label} value={label}>{label}</TabsTrigger>
           ))}
         </TabsList>
         
         <TabsContent value="all">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredRecipes.map((recipe) => (
+            {recipes.map((recipe) => (
               <RecipeCard key={recipe.id} recipe={recipe} />
             ))}
           </div>
         </TabsContent>
         
-        {Array.from(new Set(filteredRecipes.flatMap(r => r.labels))).slice(0, 5).map(label => (
+        {Array.from(new Set(recipes.flatMap(r => r.labels))).slice(0, 5).map(label => (
           <TabsContent key={label} value={label}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredRecipes.filter(recipe => recipe.labels.includes(label)).map((recipe) => (
+              {recipes.filter(recipe => recipe.labels.includes(label)).map((recipe) => (
                 <RecipeCard key={recipe.id} recipe={recipe} />
               ))}
             </div>

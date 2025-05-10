@@ -1,9 +1,9 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { RecipeDetails } from "@/components/recipe-details";
-import { useLocalStorage } from "@/hooks/use-local-storage";
+import { recipeService } from "@/services/recipe.service";
 import { Recipe } from "@/types/recipe";
 import { ArrowLeft, Edit, BookOpen, Trash } from "lucide-react";
 import {
@@ -18,13 +18,54 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function RecipeDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [recipes, setRecipes] = useLocalStorage<Recipe[]>("recipes", []);
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
   
-  const recipe = recipes.find(r => r.id === id);
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      if (!id) return;
+      
+      try {
+        const recipeData = await recipeService.getRecipeById(id);
+        setRecipe(recipeData);
+      } catch (error) {
+        console.error("Error fetching recipe:", error);
+        toast.error("Failed to load recipe");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRecipe();
+  }, [id]);
+
+  const handleDeleteRecipe = async () => {
+    if (!id) return;
+    
+    try {
+      await recipeService.deleteRecipe(id);
+      toast.success("Recipe deleted successfully!");
+      navigate("/");
+    } catch (error) {
+      console.error("Error deleting recipe:", error);
+      toast.error("Failed to delete recipe");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container py-8 flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
   
   if (!recipe) {
     return (
@@ -38,12 +79,7 @@ export default function RecipeDetailsPage() {
     );
   }
 
-  const handleDeleteRecipe = () => {
-    const updatedRecipes = recipes.filter(r => r.id !== id);
-    setRecipes(updatedRecipes);
-    toast.success("Recipe deleted successfully!");
-    navigate("/");
-  };
+  const isOwner = user && recipe.userId === user.id;
 
   return (
     <div className="container py-8">
@@ -58,47 +94,49 @@ export default function RecipeDetailsPage() {
           </Link>
         </Button>
         
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            asChild
-            className="border-olive-500"
-          >
-            <Link to={`/edit/${recipe.id}`}>
-              <Edit className="mr-2 h-4 w-4" /> Edit
-            </Link>
-          </Button>
-          
-          <Button
-            variant="outline"
-            asChild
-            className="border-olive-500"
-          >
-            <Link to="/book">
-              <BookOpen className="mr-2 h-4 w-4" /> View in Book
-            </Link>
-          </Button>
-          
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive">
-                <Trash className="mr-2 h-4 w-4" /> Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete your recipe.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteRecipe}>Delete</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
+        {isOwner && (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              asChild
+              className="border-olive-500"
+            >
+              <Link to={`/edit/${recipe.id}`}>
+                <Edit className="mr-2 h-4 w-4" /> Edit
+              </Link>
+            </Button>
+            
+            <Button
+              variant="outline"
+              asChild
+              className="border-olive-500"
+            >
+              <Link to="/book">
+                <BookOpen className="mr-2 h-4 w-4" /> View in Book
+              </Link>
+            </Button>
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">
+                  <Trash className="mr-2 h-4 w-4" /> Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete your recipe.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteRecipe}>Delete</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
       </div>
       
       <div className="recipe-page">

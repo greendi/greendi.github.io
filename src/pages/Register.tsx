@@ -1,26 +1,54 @@
 
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookText } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const { register } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { register, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect if already authenticated
+  if (isAuthenticated && !isLoading) {
+    return <Navigate to="/" />;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (register(email, password, name)) {
-      navigate("/");
+    
+    if (!email || !password) {
+      toast.error("Please enter both email and password");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      await register(email, password, name || undefined);
+      // We don't navigate immediately after registration as user needs to verify email
+    } catch (error) {
+      // Error handling is already done in the auth context
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="container flex items-center justify-center min-h-[80vh] py-8">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container flex items-center justify-center min-h-[80vh] py-8">
@@ -66,8 +94,12 @@ export default function Register() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full bg-olive-700 hover:bg-olive-800">
-              Register
+            <Button 
+              type="submit" 
+              className="w-full bg-olive-700 hover:bg-olive-800"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating Account..." : "Register"}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}

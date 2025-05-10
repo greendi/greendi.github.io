@@ -1,32 +1,54 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BookView } from "@/components/ui/book-view";
 import { RecipeDetails } from "@/components/recipe-details";
-import { useLocalStorage } from "@/hooks/use-local-storage";
 import { Recipe } from "@/types/recipe";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { TableOfContents } from "@/components/table-of-contents";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { recipeService } from "@/services/recipe.service";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function RecipeBook() {
   const { isAuthenticated, user } = useAuth();
-  const [recipes] = useLocalStorage<Recipe[]>("recipes", []);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Filter recipes for the current user and exclude hardcoded recipes
-  const userRecipes = recipes.filter(recipe => 
-    recipe.userId === user?.id && 
-    recipe.title !== "Pasta Carbonara" && 
-    recipe.title !== "Chicken and Avocado Wrap"
-  );
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const data = await recipeService.getAllRecipes();
+        setRecipes(data);
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchRecipes();
+    } else {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
   
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
   
-  if (userRecipes.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="container py-8 flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+  
+  if (recipes.length === 0) {
     return (
       <div className="container py-8">
         <h1 className="text-3xl font-bold text-olive-800 mb-6">Your Recipe Book</h1>
@@ -43,11 +65,11 @@ export default function RecipeBook() {
     // First page is Table of Contents
     <TableOfContents 
       key="toc"
-      recipes={userRecipes} 
+      recipes={recipes} 
       onSelectRecipe={(index) => setCurrentPage(index + 1)}
     />,
     // The rest are individual recipe pages
-    ...userRecipes.map((recipe) => (
+    ...recipes.map((recipe) => (
       <RecipeDetails key={recipe.id} recipe={recipe} />
     ))
   ];
