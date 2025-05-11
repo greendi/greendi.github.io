@@ -110,7 +110,6 @@ const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
                       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPgo8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxsaW5lIHgxPSI0MCIgeTE9IjAiIHgyPSI0MCIgeTI9IjEwMCUiIHN0cm9rZT0iI2VlZSIgc3Ryb2tlLXdpZHRoPSIxIiAvPgo8bGluZSB4MT0iODAiIHkxPSIwIiB4Mj0iODAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjEyMCIgeTE9IjAiIHgyPSIxMjAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjE2MCIgeTE9IjAiIHgyPSIxNjAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjIwMCIgeTE9IjAiIHgyPSIyMDAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjI0MCIgeTE9IjAiIHgyPSIyNDAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjI4MCIgeTE9IjAiIHgyPSIyODAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjMyMCIgeTE9IjAiIHgyPSIzMjAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjM2MCIgeTE9IjAiIHgyPSIzNjAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPC9zdmc+')] opacity-30" />
                       
                       {/* Page content */}
-                      {/* just a comment */}
                       <div className="relative z-10">
                         {children[activePage]}
                       </div>

@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Important for git subtree
+          token: ${{ secrets.DEPLOY_TOKEN }}  # Use the token for checkout
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -34,6 +35,9 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
           
+          # Configure git to use the token
+          git remote set-url origin https://x-access-token:${DEPLOY_TOKEN}@github.com/${{ github.repository }}
+          
           # Remove the dist directory from gitignore if it's there
           sed -i '/dist/d' .gitignore || true
           
@@ -44,4 +48,6 @@ jobs:
           git commit -m "Deploy (GitHub Actions)" || true
           
           # Push to gh-pages branch
-          git subtree push --prefix dist origin gh-pages 
+          git subtree push --prefix dist origin gh-pages
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }} 
