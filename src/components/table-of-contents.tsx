@@ -18,10 +18,9 @@ export function TableOfContents({ recipes, onSelectRecipe }: TableOfContentsProp
     a.title.localeCompare(b.title)
   );
   
-  // Filter recipes based on search query
+  // Filter recipes based on search query - only look in titles
   const filteredRecipes = sortedRecipes.filter(recipe =>
-    recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    recipe.description.toLowerCase().includes(searchQuery.toLowerCase())
+    recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Find the original index of the filtered recipe
@@ -39,7 +38,7 @@ export function TableOfContents({ recipes, onSelectRecipe }: TableOfContentsProp
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search recipes..."
+          placeholder="Search recipes by title..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10"
