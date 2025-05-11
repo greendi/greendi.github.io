@@ -1,9 +1,9 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Recipe } from "@/types/recipe";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface TableOfContentsProps {
   recipes: Recipe[];
@@ -11,6 +11,24 @@ interface TableOfContentsProps {
 }
 
 export function TableOfContents({ recipes, onSelectRecipe }: TableOfContentsProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Sort recipes alphabetically by title
+  const sortedRecipes = [...recipes].sort((a, b) => 
+    a.title.localeCompare(b.title)
+  );
+  
+  // Filter recipes based on search query
+  const filteredRecipes = sortedRecipes.filter(recipe =>
+    recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    recipe.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Find the original index of the filtered recipe
+  const getOriginalIndex = (recipe: Recipe) => {
+    return recipes.findIndex(r => r.id === recipe.id);
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
@@ -18,44 +36,55 @@ export function TableOfContents({ recipes, onSelectRecipe }: TableOfContentsProp
         <p className="text-olive-700 italic font-playfair">Your personal collection of delightful recipes</p>
       </div>
       
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search recipes..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+      
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Image</TableHead>
-            <TableHead>Recipe</TableHead>
-            <TableHead className="text-right">Action</TableHead>
+            <TableHead className="w-full">Recipe</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {recipes.map((recipe, index) => (
-            <TableRow key={recipe.id}>
-              <TableCell className="p-2">
-                <div className="w-16 h-16 overflow-hidden rounded-lg border border-olive-200">
+          {filteredRecipes.map((recipe) => (
+            <TableRow 
+              key={recipe.id} 
+              className="cursor-pointer hover:bg-olive-50"
+              onClick={() => onSelectRecipe(getOriginalIndex(recipe))}
+            >
+              <TableCell className="flex items-center p-4">
+                <div className="w-16 h-16 overflow-hidden rounded-lg border border-olive-200 mr-4 flex-shrink-0">
                   <img 
                     src={recipe.imageUrl || "/placeholder.svg"} 
                     alt={recipe.title} 
                     className="w-full h-full object-cover"
                   />
                 </div>
-              </TableCell>
-              <TableCell>
                 <div>
                   <p className="font-playfair font-medium text-lg">{recipe.title}</p>
                   <p className="text-sm text-muted-foreground line-clamp-1">{recipe.description}</p>
                 </div>
               </TableCell>
-              <TableCell className="text-right">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => onSelectRecipe(index)}
-                  className="text-olive-700 hover:text-olive-900 hover:bg-olive-100"
-                >
-                  View <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </TableCell>
             </TableRow>
           ))}
+          
+          {filteredRecipes.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={3} className="text-center py-10 text-muted-foreground">
+                {searchQuery ? 
+                  `No recipes found matching "${searchQuery}"` : 
+                  "No recipes available"
+                }
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </div>
