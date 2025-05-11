@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -281,52 +280,58 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                 </div>
               </div>
               
-              <div className="space-y-4">
-                <div>
-                  <FormLabel className="flex items-center mb-2 font-indie">
-                    <Tag className="w-4 h-4 mr-1" />
-                    Labels
-                  </FormLabel>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {labels.map((label) => (
-                      <div 
-                        key={label} 
-                        className="bg-olive-100 text-olive-800 px-2 py-1 rounded-md flex items-center gap-1 text-sm font-indie"
-                      >
-                        {label}
-                        <button 
-                          type="button"
-                          onClick={() => removeLabel(label)}
-                          className="text-olive-600 hover:text-olive-800"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
+              <div className="space-y-4 pt-4">
+                <FormField
+                  control={form.control}
+                  name="labels"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel className="font-indie">Labels</FormLabel>
+                      <FormControl>
+                        <div className="flex gap-2">
+                          <Input 
+                            placeholder="Add a label (e.g. Vegan, Spicy)" 
+                            value={labelInput}
+                            onChange={(e) => setLabelInput(e.target.value)}
+                            className="w-[280px] font-indie"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addLabel();
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={addLabel}
+                            className="font-indie"
+                          >
+                            Add
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {labels.map((label) => (
+                          <div 
+                            key={label} 
+                            className="bg-olive-100 text-olive-800 px-2 py-1 rounded-md flex items-center gap-1 text-sm font-indie"
+                          >
+                            {label}
+                            <button 
+                              type="button"
+                              onClick={() => removeLabel(label)}
+                              className="text-olive-600 hover:text-olive-800"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Input 
-                      placeholder="Add a label (e.g. Vegan, Spicy)" 
-                      value={labelInput}
-                      onChange={(e) => setLabelInput(e.target.value)}
-                      className="flex-1 font-indie"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          addLabel();
-                        }
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={addLabel}
-                      className="font-indie"
-                    >
-                      Add
-                    </Button>
-                  </div>
-                </div>
+                      <FormMessage className="font-indie" />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
             
