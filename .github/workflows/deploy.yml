@@ -38,25 +38,28 @@ jobs:
           # Configure git to use the token
           git remote set-url origin https://x-access-token:${DEPLOY_TOKEN}@github.com/${{ github.repository }}
           
-          # Remove the dist directory from gitignore if it's there
-          sed -i '/dist/d' .gitignore || true
-          
           # Create or reset gh-pages branch
           git checkout --orphan gh-pages-temp || git checkout -b gh-pages-temp
-          git rm -rf .
           
-          # Add the dist directory
-          git add dist -f
+          # Remove everything except .git and dist
+          git ls-files | grep -v "dist" | xargs git rm -f || true
           
           # Move dist contents to root
-          git mv dist/* .
-          git rm -rf dist
-          
-          # Commit the changes
-          git commit -m "Deploy (GitHub Actions) - $(date +'%Y-%m-%d %H:%M:%S')"
-          
-          # Force push to gh-pages branch
-          git push origin gh-pages-temp:gh-pages --force
+          if [ -d "dist" ]; then
+            # Move all files from dist to root
+            cp -r dist/* .
+            # Remove dist directory
+            rm -rf dist
+            # Add all files
+            git add .
+            # Commit the changes
+            git commit -m "Deploy (GitHub Actions) - $(date +'%Y-%m-%d %H:%M:%S')"
+            # Force push to gh-pages branch
+            git push origin gh-pages-temp:gh-pages --force
+          else
+            echo "Error: dist directory not found"
+            exit 1
+          fi
           
           # Clean up
           git checkout main
