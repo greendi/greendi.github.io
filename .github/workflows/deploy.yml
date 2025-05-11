@@ -41,13 +41,25 @@ jobs:
           # Remove the dist directory from gitignore if it's there
           sed -i '/dist/d' .gitignore || true
           
+          # Create or reset gh-pages branch
+          git checkout --orphan gh-pages-temp || git checkout -b gh-pages-temp
+          git rm -rf .
+          
           # Add the dist directory
           git add dist -f
           
-          # Commit the changes
-          git commit -m "Deploy (GitHub Actions)" || true
+          # Move dist contents to root
+          git mv dist/* .
+          git rm -rf dist
           
-          # Push to gh-pages branch
-          git subtree push --prefix dist origin gh-pages
+          # Commit the changes
+          git commit -m "Deploy (GitHub Actions) - $(date +'%Y-%m-%d %H:%M:%S')"
+          
+          # Force push to gh-pages branch
+          git push origin gh-pages-temp:gh-pages --force
+          
+          # Clean up
+          git checkout main
+          git branch -D gh-pages-temp
         env:
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }} 
