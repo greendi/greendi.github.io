@@ -45,9 +45,10 @@ interface RecipeFormProps {
   onSubmit: (data: RecipeFormData) => void;
   isEditing?: boolean;
   isSubmitting?: boolean;
+  hideFormTitle?: boolean;
 }
 
-export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmitting = false }: RecipeFormProps) {
+export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmitting = false, hideFormTitle = false }: RecipeFormProps) {
   const [labelInput, setLabelInput] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(defaultValues?.imageUrl || null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -124,11 +125,13 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)}>
         <Card className="border-olive-200 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-olive-800">
-              {isEditing ? "Edit Recipe" : "Create New Recipe"}
-            </CardTitle>
-          </CardHeader>
+          {!hideFormTitle && (
+            <CardHeader>
+              <CardTitle className="text-2xl text-olive-800 font-indie">
+                {isEditing ? "Edit Recipe" : "Create New Recipe"}
+              </CardTitle>
+            </CardHeader>
+          )}
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
@@ -137,11 +140,11 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Recipe Title</FormLabel>
+                      <FormLabel className="font-indie">Recipe Title</FormLabel>
                       <FormControl>
-                        <Input placeholder="Delicious Pasta" {...field} />
+                        <Input placeholder="Delicious Pasta" {...field} className="font-indie" />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="font-indie" />
                     </FormItem>
                   )}
                 />
@@ -151,21 +154,21 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel className="font-indie">Description</FormLabel>
                       <FormControl>
                         <Textarea 
                           placeholder="A brief description of your recipe..." 
-                          className="resize-none h-24" 
+                          className="resize-none h-24 font-indie" 
                           {...field} 
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="font-indie" />
                     </FormItem>
                   )}
                 />
 
                 <div>
-                  <FormLabel>Recipe Image (optional)</FormLabel>
+                  <FormLabel className="font-indie">Recipe Image (optional)</FormLabel>
                   <div className="mt-2 space-y-2">
                     {previewImage && (
                       <div className="relative w-full h-40 overflow-hidden rounded-md border border-gray-200">
@@ -195,8 +198,8 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                         onClick={handleDropzoneClick}
                       >
                         <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-500 mb-1">Click to upload or drag and drop</p>
-                        <p className="text-xs text-gray-500">SVG, PNG, JPG (max. 5MB)</p>
+                        <p className="text-sm text-gray-500 mb-1 font-indie">Click to upload or drag and drop</p>
+                        <p className="text-xs text-gray-500 font-indie">SVG, PNG, JPG (max. 5MB)</p>
                         <input
                           type="file"
                           ref={fileInputRef}
@@ -212,7 +215,7 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                     name="imageUrl"
                     render={() => (
                       <FormItem>
-                        <FormMessage />
+                        <FormMessage className="font-indie" />
                       </FormItem>
                     )}
                   />
@@ -224,16 +227,16 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                     name="prepTime"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
+                        <FormLabel className="font-indie">
                           <div className="flex items-center">
                             <Clock className="w-4 h-4 mr-1" />
                             Prep (mins)
                           </div>
                         </FormLabel>
                         <FormControl>
-                          <Input type="number" min={1} {...field} />
+                          <Input type="number" min={1} {...field} className="font-indie" />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="font-indie" />
                       </FormItem>
                     )}
                   />
@@ -243,16 +246,16 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                     name="cookTime"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
+                        <FormLabel className="font-indie">
                           <div className="flex items-center">
                             <ChefHat className="w-4 h-4 mr-1" />
                             Cook (mins)
                           </div>
                         </FormLabel>
                         <FormControl>
-                          <Input type="number" min={1} {...field} />
+                          <Input type="number" min={1} {...field} className="font-indie" />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="font-indie" />
                       </FormItem>
                     )}
                   />
@@ -262,16 +265,16 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                     name="servings"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
+                        <FormLabel className="font-indie">
                           <div className="flex items-center">
                             <Users className="w-4 h-4 mr-1" />
                             Servings
                           </div>
                         </FormLabel>
                         <FormControl>
-                          <Input type="number" min={1} {...field} />
+                          <Input type="number" min={1} {...field} className="font-indie" />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="font-indie" />
                       </FormItem>
                     )}
                   />
@@ -280,7 +283,7 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
               
               <div className="space-y-4">
                 <div>
-                  <FormLabel className="flex items-center mb-2">
+                  <FormLabel className="flex items-center mb-2 font-indie">
                     <Tag className="w-4 h-4 mr-1" />
                     Labels
                   </FormLabel>
@@ -288,7 +291,7 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                     {labels.map((label) => (
                       <div 
                         key={label} 
-                        className="bg-olive-100 text-olive-800 px-2 py-1 rounded-md flex items-center gap-1 text-sm"
+                        className="bg-olive-100 text-olive-800 px-2 py-1 rounded-md flex items-center gap-1 text-sm font-indie"
                       >
                         {label}
                         <button 
@@ -306,7 +309,7 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                       placeholder="Add a label (e.g. Vegan, Spicy)" 
                       value={labelInput}
                       onChange={(e) => setLabelInput(e.target.value)}
-                      className="flex-1"
+                      className="flex-1 font-indie"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
@@ -318,6 +321,7 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                       type="button"
                       variant="outline"
                       onClick={addLabel}
+                      className="font-indie"
                     >
                       Add
                     </Button>
@@ -327,7 +331,7 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
             </div>
             
             <div className="border-t border-olive-100 pt-4">
-              <FormLabel className="mb-2 block">Ingredients</FormLabel>
+              <FormLabel className="mb-2 block font-indie">Ingredients</FormLabel>
               <div className="space-y-3">
                 {ingredientFields.map((field, index) => (
                   <div key={field.id} className="flex gap-3">
@@ -337,9 +341,9 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                       render={({ field }) => (
                         <FormItem className="flex-1">
                           <FormControl>
-                            <Input placeholder="Ingredient" {...field} />
+                            <Input placeholder="Ingredient" {...field} className="font-indie" />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="font-indie" />
                         </FormItem>
                       )}
                     />
@@ -349,9 +353,9 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                       render={({ field }) => (
                         <FormItem className="w-20">
                           <FormControl>
-                            <Input placeholder="Qty" {...field} />
+                            <Input placeholder="Qty" {...field} className="font-indie" />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="font-indie" />
                         </FormItem>
                       )}
                     />
@@ -361,9 +365,9 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                       render={({ field }) => (
                         <FormItem className="w-20">
                           <FormControl>
-                            <Input placeholder="Unit" {...field} />
+                            <Input placeholder="Unit" {...field} className="font-indie" />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="font-indie" />
                         </FormItem>
                       )}
                     />
@@ -384,7 +388,7 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                   type="button"
                   variant="outline"
                   onClick={() => appendIngredient({ id: uuidv4(), name: "", amount: "", unit: "" })}
-                  className="w-full border-dashed border-olive-300"
+                  className="w-full border-dashed border-olive-300 font-indie"
                 >
                   <Plus className="mr-2 h-4 w-4" /> Add Ingredient
                 </Button>
@@ -392,11 +396,11 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
             </div>
 
             <div className="border-t border-olive-100 pt-4">
-              <FormLabel className="mb-2 block">Steps</FormLabel>
+              <FormLabel className="mb-2 block font-indie">Steps</FormLabel>
               <div className="space-y-3">
                 {stepFields.map((field, index) => (
                   <div key={field.id} className="flex gap-3">
-                    <div className="flex items-center justify-center px-2 py-1 bg-olive-100 rounded text-olive-800 font-medium min-w-[30px] h-10">
+                    <div className="flex items-center justify-center px-2 py-1 bg-olive-100 rounded text-olive-800 font-indie font-medium min-w-[30px] h-10">
                       {index + 1}
                     </div>
                     <FormField
@@ -405,9 +409,9 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                       render={({ field }) => (
                         <FormItem className="flex-1">
                           <FormControl>
-                            <Input placeholder="Step description" {...field} />
+                            <Input placeholder="Step description" {...field} className="font-indie" />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="font-indie" />
                         </FormItem>
                       )}
                     />
@@ -428,7 +432,7 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                   type="button"
                   variant="outline"
                   onClick={() => appendStep({ id: uuidv4(), description: "" })}
-                  className="w-full border-dashed border-olive-300"
+                  className="w-full border-dashed border-olive-300 font-indie"
                 >
                   <Plus className="mr-2 h-4 w-4" /> Add Step
                 </Button>
@@ -436,7 +440,7 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
             </div>
           </CardContent>
           <CardFooter className="flex justify-end gap-2 border-t border-olive-100 pt-4">
-            <Button type="submit" className="bg-olive-700 hover:bg-olive-800" disabled={isSubmitting}>
+            <Button type="submit" className="bg-olive-700 hover:bg-olive-800 font-indie" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Spinner size="sm" className="mr-2" />

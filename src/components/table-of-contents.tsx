@@ -31,8 +31,8 @@ export function TableOfContents({ recipes, onSelectRecipe }: TableOfContentsProp
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-playfair font-bold text-olive-900 mb-2">Table of Contents</h2>
-        <p className="text-olive-700 italic font-playfair">Your personal collection of delightful recipes</p>
+        <h2 className="text-3xl font-indie font-bold text-olive-900 mb-2">Table of Contents</h2>
+        <p className="text-olive-700 italic font-indie">Your personal collection of delightful recipes</p>
       </div>
       
       <div className="relative mb-4">
@@ -41,14 +41,14 @@ export function TableOfContents({ recipes, onSelectRecipe }: TableOfContentsProp
           placeholder="Search recipes by title..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
+          className="pl-10 font-indie"
         />
       </div>
       
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-full">Recipe</TableHead>
+            <TableHead className="w-full font-indie">Recipe</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -67,8 +67,8 @@ export function TableOfContents({ recipes, onSelectRecipe }: TableOfContentsProp
                   />
                 </div>
                 <div>
-                  <p className="font-playfair font-medium text-lg">{recipe.title}</p>
-                  <p className="text-sm text-muted-foreground line-clamp-1">{recipe.description}</p>
+                  <p className="font-indie font-medium text-lg">{recipe.title}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-1 font-indie">{recipe.description}</p>
                 </div>
               </TableCell>
             </TableRow>
@@ -76,7 +76,7 @@ export function TableOfContents({ recipes, onSelectRecipe }: TableOfContentsProp
           
           {filteredRecipes.length === 0 && (
             <TableRow>
-              <TableCell colSpan={3} className="text-center py-10 text-muted-foreground">
+              <TableCell colSpan={3} className="text-center py-10 text-muted-foreground font-indie">
                 {searchQuery ? 
                   `No recipes found matching "${searchQuery}"` : 
                   "No recipes available"

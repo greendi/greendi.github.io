@@ -44,7 +44,7 @@ export default function Login() {
   if (isLoading) {
     return (
       <div className="container flex items-center justify-center min-h-[80vh] py-8">
-        <p>Loading...</p>
+        <p className="font-indie">Loading...</p>
       </div>
     );
   }
@@ -56,13 +56,13 @@ export default function Login() {
           <div className="w-12 h-12 rounded-full bg-olive-100 flex items-center justify-center mb-2">
             <BookText className="h-6 w-6 text-olive-700" />
           </div>
-          <CardTitle className="text-2xl font-playfair text-olive-800">Welcome Back</CardTitle>
-          <CardDescription>Enter your credentials to access your recipes</CardDescription>
+          <CardTitle className="text-2xl font-indie text-olive-800">Welcome Back</CardTitle>
+          <CardDescription className="font-indie">Enter your credentials to access your recipes</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="font-indie">Email</Label>
               <Input 
                 id="email" 
                 type="email" 
@@ -70,11 +70,12 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="font-indie"
               />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="font-indie">Password</Label>
               </div>
               <Input 
                 id="password" 
@@ -82,20 +83,21 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="font-indie"
               />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button 
               type="submit" 
-              className="w-full bg-olive-700 hover:bg-olive-800"
+              className="w-full bg-olive-700 hover:bg-olive-800 font-indie"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Signing In..." : "Sign In"}
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="text-center text-sm text-muted-foreground font-indie">
               Don't have an account?{" "}
-              <Link to="/register" className="text-olive-700 hover:underline">
+              <Link to="/register" className="text-olive-700 hover:underline font-indie">
                 Register
               </Link>
             </p>

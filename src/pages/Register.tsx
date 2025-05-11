@@ -45,7 +45,7 @@ export default function Register() {
   if (isLoading) {
     return (
       <div className="container flex items-center justify-center min-h-[80vh] py-8">
-        <p>Loading...</p>
+        <p className="font-indie">Loading...</p>
       </div>
     );
   }
@@ -57,22 +57,23 @@ export default function Register() {
           <div className="w-12 h-12 rounded-full bg-olive-100 flex items-center justify-center mb-2">
             <BookText className="h-6 w-6 text-olive-700" />
           </div>
-          <CardTitle className="text-2xl font-playfair text-olive-800">Create an Account</CardTitle>
-          <CardDescription>Enter your details to create your recipe account</CardDescription>
+          <CardTitle className="text-2xl font-indie text-olive-800">Create an Account</CardTitle>
+          <CardDescription className="font-indie">Enter your details to create your recipe account</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name (optional)</Label>
+              <Label htmlFor="name" className="font-indie">Name (optional)</Label>
               <Input 
                 id="name" 
                 placeholder="Your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="font-indie"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="font-indie">Email</Label>
               <Input 
                 id="email" 
                 type="email" 
@@ -80,30 +81,32 @@ export default function Register() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="font-indie"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="font-indie">Password</Label>
               <Input 
                 id="password" 
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="font-indie"
               />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button 
               type="submit" 
-              className="w-full bg-olive-700 hover:bg-olive-800"
+              className="w-full bg-olive-700 hover:bg-olive-800 font-indie"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Creating Account..." : "Register"}
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="text-center text-sm text-muted-foreground font-indie">
               Already have an account?{" "}
-              <Link to="/login" className="text-olive-700 hover:underline">
+              <Link to="/login" className="text-olive-700 hover:underline font-indie">
                 Sign In
               </Link>
             </p>

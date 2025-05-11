@@ -64,10 +64,11 @@ export default function CreateRecipe() {
 
   return (
     <div className="container py-8">
-      <h1 className="text-3xl font-bold text-olive-800 mb-6 font-playfair">Create New Recipe</h1>
+      <h1 className="text-3xl font-bold text-olive-800 mb-6 font-indie">Create New Recipe</h1>
       <RecipeForm 
         onSubmit={handleCreateRecipe} 
-        isSubmitting={isSubmitting} 
+        isSubmitting={isSubmitting}
+        hideFormTitle={true}
       />
     </div>
   );

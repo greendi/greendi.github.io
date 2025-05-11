@@ -78,8 +78,8 @@ export default function EditRecipe() {
   if (!recipe) {
     return (
       <div className="container py-8">
-        <h1 className="text-3xl font-bold text-olive-800 mb-6">Recipe Not Found</h1>
-        <p>The recipe you are trying to edit does not exist.</p>
+        <h1 className="text-3xl font-bold text-olive-800 mb-6 font-indie">Recipe Not Found</h1>
+        <p className="font-indie">The recipe you are trying to edit does not exist.</p>
       </div>
     );
   }
@@ -88,20 +88,21 @@ export default function EditRecipe() {
   if (recipe.userId !== user?.id) {
     return (
       <div className="container py-8">
-        <h1 className="text-3xl font-bold text-olive-800 mb-6">Unauthorized</h1>
-        <p>You don't have permission to edit this recipe.</p>
+        <h1 className="text-3xl font-bold text-olive-800 mb-6 font-indie">Unauthorized</h1>
+        <p className="font-indie">You don't have permission to edit this recipe.</p>
       </div>
     );
   }
 
   return (
     <div className="container py-8">
-      <h1 className="text-3xl font-bold text-olive-800 mb-6">Edit Recipe</h1>
+      <h1 className="text-3xl font-bold text-olive-800 mb-6 font-indie">Edit Recipe</h1>
       <RecipeForm 
         defaultValues={recipe} 
         onSubmit={handleUpdateRecipe} 
         isEditing
         isSubmitting={isSubmitting}
+        hideFormTitle={true}
       />
     </div>
   );
