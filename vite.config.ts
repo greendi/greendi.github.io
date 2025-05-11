@@ -19,5 +19,5 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: '/greendi.github.io/', // Replace with your repo name
+  base: '/',
 }));
