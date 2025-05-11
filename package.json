@@ -4,6 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "homepage": "https://greendi.github.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/greendi/greendi.github.io.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
