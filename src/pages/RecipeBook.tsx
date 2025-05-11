@@ -51,9 +51,9 @@ export default function RecipeBook() {
   if (recipes.length === 0) {
     return (
       <div className="container py-8">
-        <h1 className="text-3xl font-bold text-olive-800 mb-6">Your Recipe Book</h1>
-        <p>You don't have any recipes yet. Create some to view them in book format.</p>
-        <Button asChild className="mt-4 bg-olive-700 hover:bg-olive-800">
+        <h1 className="text-3xl font-bold text-olive-800 mb-6 font-indie">Your Recipe Book</h1>
+        <p className="font-indie">You don't have any recipes yet. Create some to view them in book format.</p>
+        <Button asChild className="mt-4 bg-olive-700 hover:bg-olive-800 font-indie">
           <Link to="/create">Create Your First Recipe</Link>
         </Button>
       </div>
@@ -77,11 +77,11 @@ export default function RecipeBook() {
   return (
     <div className="container py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-olive-800">Your Recipe Book</h1>
+        <h1 className="text-3xl font-bold text-olive-800 font-indie">Your Recipe Book</h1>
         <Button
           variant="outline"
           asChild
-          className="border-olive-500"
+          className="border-olive-500 font-indie"
         >
           <Link to="/">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Recipes

@@ -1,7 +1,7 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "./button";
 import { ScrollArea } from "./scroll-area";
 
@@ -14,8 +14,10 @@ interface BookViewProps extends React.HTMLAttributes<HTMLDivElement> {
 const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
   ({ className, children, currentPage = 0, onPageChange, ...props }, ref) => {
     const [activePage, setActivePage] = React.useState(currentPage);
+    const [isFullscreen, setIsFullscreen] = React.useState(false);
     const totalPages = React.Children.count(children);
     const [isFlipping, setIsFlipping] = React.useState(false);
+    const bookContainerRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
       setActivePage(currentPage);
@@ -38,16 +40,62 @@ const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
       }
     };
 
+    const toggleFullscreen = () => {
+      if (isFullscreen) {
+        document.exitFullscreen();
+      } else if (bookContainerRef.current) {
+        bookContainerRef.current.requestFullscreen();
+      }
+      setIsFullscreen(!isFullscreen);
+    };
+
+    React.useEffect(() => {
+      const handleFullscreenChange = () => {
+        setIsFullscreen(!!document.fullscreenElement);
+      };
+
+      document.addEventListener('fullscreenchange', handleFullscreenChange);
+      return () => {
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      };
+    }, []);
+
     return (
       <div
-        ref={ref}
-        className={cn("w-full max-w-5xl mx-auto relative book-container", className)}
+        ref={(node) => {
+          if (ref) {
+            if (typeof ref === 'function') {
+              ref(node);
+            } else {
+              ref.current = node;
+            }
+          }
+          bookContainerRef.current = node;
+        }}
+        className={cn(
+          "w-full max-w-5xl mx-auto relative book-container transition-all duration-300",
+          isFullscreen ? "max-w-none flex flex-col h-screen justify-center" : "",
+          className
+        )}
         {...props}
       >
-        <div className="flex flex-col items-center">
-          <div className="w-full aspect-[2/1.3] bg-cream-50 shadow-xl rounded-lg overflow-hidden border border-olive-300 relative">
+        <div className={cn("flex flex-col items-center", isFullscreen ? "h-full" : "")}>
+          <div className={cn(
+            "w-full aspect-[2/1.3] bg-cream-50 shadow-xl rounded-lg overflow-hidden border border-olive-300 relative",
+            isFullscreen ? "max-h-[80vh] h-full" : ""
+          )}>
             {/* Leather texture overlay */}
             <div className="absolute inset-0 bg-paper-texture opacity-20 mix-blend-overlay pointer-events-none" />
+            
+            {/* Fullscreen button */}
+            <Button
+              onClick={toggleFullscreen}
+              variant="ghost"
+              size="icon"
+              className="absolute top-3 right-3 z-10 bg-olive-100/70 hover:bg-olive-200/70 text-olive-700"
+            >
+              {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            </Button>
             
             {/* Book spine and binding effect */}
             <div className="flex h-full shadow-2xl">
@@ -72,7 +120,7 @@ const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
           </div>
 
           {/* Page navigation controls */}
-          <div className="mt-8 flex items-center gap-6">
+          <div className={cn("mt-8 flex items-center gap-6", isFullscreen ? "mt-4 pb-4" : "")}>
             <Button
               onClick={() => handlePageChange(activePage - 1)}
               disabled={activePage === 0}
@@ -81,7 +129,7 @@ const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
             >
               <ChevronLeft className="mr-2 h-4 w-4" /> Previous Page
             </Button>
-            <span className="text-olive-800 font-semibold">
+            <span className="text-olive-800 font-semibold font-indie">
               Page {activePage + 1} of {totalPages}
             </span>
             <Button
