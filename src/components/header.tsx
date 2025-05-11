@@ -2,10 +2,10 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { BookOpen, LogOut, User, Plus } from "lucide-react";
+import { BookOpen, LogOut, Plus } from "lucide-react";
 
 export function Header() {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, profile, logout, isAuthenticated } = useAuth();
 
   return (
     <header className="bg-olive-800 text-white shadow-md py-4">
@@ -37,7 +37,7 @@ export function Header() {
           {isAuthenticated ? (
             <div className="flex items-center gap-4">
               <div className="text-sm font-medium">
-                {user?.name || user?.email}
+                {profile?.name || user?.email}
               </div>
               <Button 
                 variant="ghost" 
