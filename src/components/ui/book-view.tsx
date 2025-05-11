@@ -74,82 +74,95 @@ const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
         }}
         className={cn(
           "w-full max-w-6xl mx-auto relative book-container",
-          isFullscreen ? "max-w-none h-screen" : "",
+          isFullscreen ? "fixed inset-0 w-screen h-screen" : "",
           className
         )}
         {...props}
       >
-        <div className="flex flex-col items-center">
-          {/* Notepad container */}
-          <div className={cn(
-            "w-full max-w-4xl mx-auto bg-cream-50 shadow-lg rounded-lg overflow-hidden relative",
-            isFullscreen ? "h-[calc(100vh-8rem)]" : "h-[85vh]"
-          )}>
-            {/* Spiral binding at top */}
-            <div className="absolute -top-1 left-0 right-0 h-8 flex items-center justify-center gap-1 px-4 z-20">
-              {Array.from({ length: 24 }).map((_, i) => (
-                <div key={i} className="w-3 h-6 rounded-full border-2 border-olive-300 bg-cream-50 shadow-sm" />
-              ))}
-            </div>
-            
-            {/* Notepad pages */}
-            <div className="h-[calc(100%-2rem)] mt-8 px-4">
-              <div className="h-full bg-white rounded-lg shadow-inner">
-                <ScrollArea className="h-[calc(100%-1rem)]">
-                  <div className="p-8 min-h-[800px]">
-                    {/* Page content with subtle shadow to show stacking */}
-                    <div 
-                      className={cn(
-                        "w-full bg-white shadow-sm rounded-lg",
-                        isFlipping && flipDirection === 'right' && "animate-page-flip-right",
-                        isFlipping && flipDirection === 'left' && "animate-page-flip-left"
-                      )}
-                    >
-                      {/* Page texture - vertical lines for notepad */}
-                      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPgo8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxsaW5lIHgxPSI0MCIgeTE9IjAiIHgyPSI0MCIgeTI9IjEwMCUiIHN0cm9rZT0iI2VlZSIgc3Ryb2tlLXdpZHRoPSIxIiAvPgo8bGluZSB4MT0iODAiIHkxPSIwIiB4Mj0iODAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjEyMCIgeTE9IjAiIHgyPSIxMjAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjE2MCIgeTE9IjAiIHgyPSIxNjAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjIwMCIgeTE9IjAiIHgyPSIyMDAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjI0MCIgeTE9IjAiIHgyPSIyNDAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjI4MCIgeTE9IjAiIHgyPSIyODAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjMyMCIgeTE9IjAiIHgyPSIzMjAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjM2MCIgeTE9IjAiIHgyPSIzNjAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPC9zdmc+')] opacity-30" />
-                      
-                      {/* Page content */}
-                      <div className="relative z-10">
-                        {children[activePage]}
-                      </div>
-                    </div>
-                  </div>
-                </ScrollArea>
-              </div>
-            </div>
+        <div className={cn(
+          "flex flex-col items-center h-full",
+          isFullscreen ? "h-screen" : ""
+        )}>
+          {/* Notepad container with navigation */}
+          <div className="relative w-full max-w-4xl mx-auto flex-1 flex flex-col">
+            {/* Left navigation button */}
+            <Button
+              onClick={() => handlePageChange(activePage - 1)}
+              disabled={activePage === 0}
+              variant="ghost"
+              size="icon"
+              className="absolute -left-16 top-1/2 -translate-y-1/2 z-30 h-14 w-14 rounded-full bg-cream-50/90 hover:bg-cream-100/90 text-olive-700 shadow-lg transition-transform hover:scale-110 disabled:opacity-50 disabled:hover:scale-100"
+            >
+              <ChevronLeft className="h-7 w-7" />
+            </Button>
 
             {/* Fullscreen button */}
             <Button
               onClick={toggleFullscreen}
               variant="ghost"
               size="icon"
-              className="absolute top-10 right-3 z-20 bg-cream-50/70 hover:bg-cream-100/70 text-olive-700"
+              className="absolute -right-32 top-4 z-30 h-14 w-14 rounded-full bg-cream-50/90 hover:bg-cream-100/90 text-olive-700 shadow-lg transition-transform hover:scale-110"
             >
-              {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              {isFullscreen ? <Minimize2 className="h-7 w-7" /> : <Maximize2 className="h-7 w-7" />}
             </Button>
-          </div>
 
-          {/* Page navigation controls */}
-          <div className="mt-6 flex items-center justify-center gap-6">
-            <Button
-              onClick={() => handlePageChange(activePage - 1)}
-              disabled={activePage === 0}
-              variant="outline"
-              className="border-olive-500 font-indie hover:bg-olive-100 shadow-md"
-            >
-              <ChevronLeft className="mr-2 h-4 w-4" /> Previous Page
-            </Button>
-            <span className="text-olive-800 font-semibold font-indie min-w-[120px] text-center">
-              Page {activePage + 1} of {totalPages}
-            </span>
+            {/* Right navigation button */}
             <Button
               onClick={() => handlePageChange(activePage + 1)}
               disabled={activePage === totalPages - 1}
-              variant="outline"
-              className="border-olive-500 font-indie hover:bg-olive-100 shadow-md"
+              variant="ghost"
+              size="icon"
+              className="absolute -right-16 top-1/2 -translate-y-1/2 z-30 h-14 w-14 rounded-full bg-cream-50/90 hover:bg-cream-100/90 text-olive-700 shadow-lg transition-transform hover:scale-110 disabled:opacity-50 disabled:hover:scale-100"
             >
-              Next Page <ChevronRight className="ml-2 h-4 w-4" />
+              <ChevronRight className="h-7 w-7" />
             </Button>
+
+            {/* Notepad container */}
+            <div className={cn(
+              "w-full bg-cream-50 shadow-lg rounded-lg overflow-hidden relative flex flex-col",
+              isFullscreen ? "h-[calc(100vh-8rem)]" : "h-[85vh]"
+            )}>
+              {/* Spiral binding at top */}
+              <div className="absolute -top-1 left-0 right-0 h-8 flex items-center justify-center gap-1 px-4 z-20">
+                {Array.from({ length: 24 }).map((_, i) => (
+                  <div key={i} className="w-3 h-6 rounded-full border-2 border-olive-300 bg-cream-50 shadow-sm" />
+                ))}
+              </div>
+              
+              {/* Notepad pages */}
+              <div className="flex-1 mt-8 px-4 pb-4 overflow-hidden">
+                <div className="h-full bg-white rounded-lg shadow-inner overflow-hidden">
+                  <ScrollArea className="h-full">
+                    <div className="p-8">
+                      {/* Page content with subtle shadow to show stacking */}
+                      <div 
+                        className={cn(
+                          "w-full bg-white shadow-sm rounded-lg",
+                          isFlipping && flipDirection === 'right' && "animate-page-flip-right",
+                          isFlipping && flipDirection === 'left' && "animate-page-flip-left"
+                        )}
+                      >
+                        {/* Page texture - vertical lines for notepad */}
+                        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPgo8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxsaW5lIHgxPSI0MCIgeTE9IjAiIHgyPSI0MCIgeTI9IjEwMCUiIHN0cm9rZT0iI2VlZSIgc3Ryb2tlLXdpZHRoPSIxIiAvPgo8bGluZSB4MT0iODAiIHkxPSIwIiB4Mj0iODAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjEyMCIgeTE9IjAiIHgyPSIxMjAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjE2MCIgeTE9IjAiIHgyPSIxNjAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjIwMCIgeTE9IjAiIHgyPSIyMDAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjI0MCIgeTE9IjAiIHgyPSIyNDAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjI4MCIgeTE9IjAiIHgyPSIyODAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjMyMCIgeTE9IjAiIHgyPSIzMjAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPGxpbmUgeDE9IjM2MCIgeTE9IjAiIHgyPSIzNjAiIHkyPSIxMDAlIiBzdHJva2U9IiNlZWUiIHN0cm9rZS13aWR0aD0iMSIgLz4KPC9zdmc+')] opacity-30" />
+                        
+                        {/* Page content */}
+                        <div className="relative z-10">
+                          {children[activePage]}
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Page counter */}
+          <div className={cn(
+            "text-olive-800 font-semibold font-indie py-4",
+            isFullscreen ? "mb-0" : ""
+          )}>
+            Page {activePage + 1} of {totalPages}
           </div>
         </div>
       </div>
