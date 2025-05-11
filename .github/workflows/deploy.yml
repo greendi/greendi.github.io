@@ -1,0 +1,47 @@
+name: Deploy to GitHub Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Important for git subtree
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          
+          # Remove the dist directory from gitignore if it's there
+          sed -i '/dist/d' .gitignore || true
+          
+          # Add the dist directory
+          git add dist -f
+          
+          # Commit the changes
+          git commit -m "Deploy (GitHub Actions)" || true
+          
+          # Push to gh-pages branch
+          git subtree push --prefix dist origin gh-pages 
