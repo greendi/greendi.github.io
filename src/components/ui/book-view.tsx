@@ -73,35 +73,34 @@ const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
           bookContainerRef.current = node;
         }}
         className={cn(
-          "w-full max-w-6xl mx-auto relative book-container transition-all duration-300",
-          isFullscreen ? "max-w-none flex flex-col h-screen justify-center" : "",
+          "w-full max-w-6xl mx-auto relative book-container",
+          isFullscreen ? "max-w-none h-screen" : "",
           className
         )}
         {...props}
       >
-        <div className={cn("flex flex-col items-center", isFullscreen ? "h-full" : "")}>
+        <div className="flex flex-col items-center">
           {/* Notepad container */}
           <div className={cn(
-            "w-full max-w-3xl mx-auto bg-cream-50 shadow-lg rounded-lg overflow-hidden relative",
-            isFullscreen ? "max-h-[85vh] h-full" : ""
+            "w-full max-w-4xl mx-auto bg-cream-50 shadow-lg rounded-lg overflow-hidden relative",
+            isFullscreen ? "h-[calc(100vh-8rem)]" : "h-[85vh]"
           )}>
             {/* Spiral binding at top */}
-            <div className="absolute -top-1 left-0 right-0 h-8 flex items-center justify-center gap-1 px-4">
+            <div className="absolute -top-1 left-0 right-0 h-8 flex items-center justify-center gap-1 px-4 z-20">
               {Array.from({ length: 24 }).map((_, i) => (
                 <div key={i} className="w-3 h-6 rounded-full border-2 border-olive-300 bg-cream-50 shadow-sm" />
               ))}
             </div>
             
             {/* Notepad pages */}
-            <div className="pt-8 pb-4 px-4">
-              {/* Pages stack */}
-              <div className="relative min-h-[60vh] bg-white rounded-lg shadow-inner">
-                <ScrollArea className="w-full h-full">
-                  <div className="relative">
+            <div className="h-[calc(100%-2rem)] mt-8 px-4">
+              <div className="h-full bg-white rounded-lg shadow-inner">
+                <ScrollArea className="h-[calc(100%-1rem)]">
+                  <div className="p-8 min-h-[800px]">
                     {/* Page content with subtle shadow to show stacking */}
                     <div 
                       className={cn(
-                        "w-full px-8 py-10 transition-all duration-300 bg-white shadow-sm rounded-lg mx-2 my-2",
+                        "w-full bg-white shadow-sm rounded-lg",
                         isFlipping && flipDirection === 'right' && "animate-page-flip-right",
                         isFlipping && flipDirection === 'left' && "animate-page-flip-left"
                       )}
@@ -124,13 +123,13 @@ const BookView = React.forwardRef<HTMLDivElement, BookViewProps>(
               onClick={toggleFullscreen}
               variant="ghost"
               size="icon"
-              className="absolute top-10 right-3 z-10 bg-cream-50/70 hover:bg-cream-100/70 text-olive-700"
+              className="absolute top-10 right-3 z-20 bg-cream-50/70 hover:bg-cream-100/70 text-olive-700"
             >
               {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
             </Button>
           </div>
 
-          {/* Page navigation controls - moved outside the notebook */}
+          {/* Page navigation controls */}
           <div className="mt-6 flex items-center justify-center gap-6">
             <Button
               onClick={() => handlePageChange(activePage - 1)}
