@@ -28,13 +28,18 @@ export default function CreateRecipe() {
     
     try {
       // Handle image upload if there's a file
-      if (data.imageUrl && data.imageUrl.startsWith('blob:')) {
-        // This is a new file upload (from a file input)
-        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-        if (fileInput?.files?.length) {
-          const file = fileInput.files[0];
-          const imageUrl = await recipeService.uploadImage(file);
+      if (data.imageUrl && data.imageUrl.startsWith('data:')) {
+        // This is a base64 encoded image from the file input
+        try {
+          const imageFile = await fetch(data.imageUrl)
+            .then(res => res.blob())
+            .then(blob => new File([blob], "recipe-image.jpg", { type: "image/jpeg" }));
+          
+          const imageUrl = await recipeService.uploadImage(imageFile);
           data.imageUrl = imageUrl;
+        } catch (error) {
+          console.error("Error converting base64 to file:", error);
+          // Continue with creation even if image upload fails
         }
       }
       

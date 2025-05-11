@@ -50,6 +50,7 @@ interface RecipeFormProps {
 export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmitting = false }: RecipeFormProps) {
   const [labelInput, setLabelInput] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(defaultValues?.imageUrl || null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm<RecipeFormValues>({
     resolver: zodResolver(recipeFormSchema),
@@ -104,6 +105,10 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
       form.setValue("imageUrl", reader.result as string);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleDropzoneClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleSubmit = (data: RecipeFormValues) => {
@@ -185,14 +190,18 @@ export function RecipeForm({ defaultValues, onSubmit, isEditing = false, isSubmi
                     )}
                     
                     {!previewImage && (
-                      <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center">
+                      <div 
+                        className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center cursor-pointer" 
+                        onClick={handleDropzoneClick}
+                      >
                         <Upload className="h-8 w-8 text-gray-400 mb-2" />
                         <p className="text-sm text-gray-500 mb-1">Click to upload or drag and drop</p>
                         <p className="text-xs text-gray-500">SVG, PNG, JPG (max. 5MB)</p>
-                        <Input
+                        <input
                           type="file"
+                          ref={fileInputRef}
                           accept="image/*"
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          className="hidden"
                           onChange={handleImageChange}
                         />
                       </div>
